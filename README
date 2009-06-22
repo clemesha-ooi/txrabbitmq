@@ -1,0 +1,17 @@
+txrabbitmqctl - RabbitMQ's 'rabbitmqctl' as a Twisted Service.
+==============================================================
+
+Overview
+--------
+
+Implements RabbitMQ's 'rabbitmqctl' command line tool as a Twisted Service, 
+Expose this functionality over several protocols, most importantly: HTTP and AMQP.
+
+Requires
+--------
+Twotp 0.6+ - Twisted interface to Erlang OTP - https://launchpad.net/twotp
+
+
+Usage
+-----
+$ twistd -ny webui-example.tac.py
