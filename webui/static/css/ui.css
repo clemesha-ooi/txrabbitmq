@@ -1,0 +1,28 @@
+/* greys: #e3e3e3 , #9e9e9e , #7e7e7e , #4d4d4d , #383838 */
+#header {
+  font-size:1.8em;
+  margin-bottom:12px;
+  padding:8px;
+  background-color:#e3e3e3;
+  border: 1px solid #9e9e9e;
+  border-top:none;
+}
+p.title {
+  padding:4px;
+  margin-bottom:12px;
+  background-color:#e3e3e3;
+  border-bottom: 1px solid #9e9e9e;
+}
+#left_sidebar, #main {
+  border: 1px solid #9e9e9e;
+  font-size:120%;
+}
+#left_sidebar ul {
+  margin-bottom:12px;
+}
+
+ul#send_messages li {
+  list-style:none;
+  margin:10px;
+  border-bottom: 1px solid #e3e3e3;
+}

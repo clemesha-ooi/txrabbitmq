@@ -29,8 +29,8 @@ class RabbitMQControlService(service.Service):
     @inlineCallbacks
     def add_user(self, username, password):
         """add new user with given password"""
-        result = yield self.process.callRemote(self.nodename, "rabbit_access_control", "add_user", 
-            Binary(username), Binary(password))
+        module = "rabbit_access_control"
+        result = yield self.process.callRemote(self.nodename, module, "add_user", username, password)
         returnValue(result)
 
     def delete_user(self, username):
@@ -44,7 +44,8 @@ class RabbitMQControlService(service.Service):
     @inlineCallbacks
     def list_users(self):
         """list all users"""
-        users = yield self.process.callRemote(self.nodename, "rabbit_access_control", "list_users")
+        module = "rabbit_access_control"
+        users = yield self.process.callRemote(self.nodename, module, "list_users")
         returnValue(users)
 
     def add_vhost(self, vhostpath):
@@ -58,7 +59,8 @@ class RabbitMQControlService(service.Service):
     @inlineCallbacks
     def list_vhosts(self):
         """list all vhosts"""
-        vhosts = yield self.process.callRemote(self.nodename, "rabbit_access_control", "list_vhosts")
+        module = "rabbit_access_control"
+        vhosts = yield self.process.callRemote(self.nodename, module, "list_vhosts")
         returnValue(vhosts)
 
     def map_user_vhost(self, username, vhostpath):

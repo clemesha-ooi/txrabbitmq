@@ -7,7 +7,7 @@ from twisted.web import resource, server
 from twotp import Process, readCookie, buildNodeName
 
 from rabbitmqctl_service import RabbitMQControlService
-from webui import RabbitMQControlWebUI
+from webui.webui import RabbitMQControlWebUI
 
 WEBLOGPATH = "/tmp/txrabbitmqctl.web.%d.log" % int(time.time())
 

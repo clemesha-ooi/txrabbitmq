@@ -9,6 +9,7 @@ Example emulating rabbitmqctl, just calling list_vhosts for now.
 from twisted.internet import reactor
 
 from twotp import Process, readCookie, buildNodeName
+from twotp.term import Binary, Atom
 
 
 def testListVhost(process):
@@ -18,8 +19,9 @@ def testListVhost(process):
     def eb(error):
         print "Got error", error
         reactor.stop()
-    process.callRemote("rabbit", "rabbit_access_control", "list_vhosts"
-        ).addCallback(cb).addErrback(eb)
+    un, pw = Atom("guest"), Binary("pass2")
+    print un, pw
+    process.callRemote("rabbit", "rabbit_access_control", "delete_user", "guest").addCallback(cb).addErrback(eb)
 
 
 if __name__ == "__main__":
