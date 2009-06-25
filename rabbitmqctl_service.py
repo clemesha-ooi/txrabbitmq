@@ -16,67 +16,170 @@ class RabbitMQControlService(service.Service):
     as well as the ability to do management
     functions like add users and vhosts, etc.
 
-    The communication happens with TwOPT, which
+    The communication happens with Twotp, which
     implements the Erlang node protocol for Twisted.
     """
 
     implements(IRabbitMQControlService)
 
-    def __init__(self, process, nodename="rabbit"):
+    def __init__(self, process, nodename="rabbit", module="rabbit_access_control"):
         self.process = process
         self.nodename = nodename
+        self.module = module
 
     @inlineCallbacks
     def add_user(self, username, password):
         """add new user with given password"""
-        module = "rabbit_access_control"
-        result = yield self.process.callRemote(self.nodename, module, "add_user", username, password)
-        returnValue(result)
+        username, password = Binary(username), Binary(password)
+        result = yield self.process.callRemote(self.nodename, self.module, "add_user", username, password)
+        print result
+        response = {"command":"add_user", "username":username.value, "result":result.value}
+        returnValue(response)
 
+    @inlineCallbacks
     def delete_user(self, username):
         """delete user"""
-        pass
+        username = Binary(username)
+        result = yield self.process.callRemote(self.nodename, self.module, "delete_user", username)
+        response = {"command":"delete_user", "username":username.value, "result":result.value}
+        returnValue(response)
 
+    @inlineCallbacks
     def change_password(self, username, password):
         """change user password"""
-        pass
+        username, password = Binary(username), Binary(password)
+        result = yield self.process.callRemote(self.nodename, self.module, "change_password", username, password)
+        response = {"command":"change_password", "username":username.value, "result":result.value}
+        returnValue(response)
 
     @inlineCallbacks
     def list_users(self):
         """list all users"""
-        module = "rabbit_access_control"
-        users = yield self.process.callRemote(self.nodename, module, "list_users")
-        returnValue(users)
+        users = yield self.process.callRemote(self.nodename, self.module, "list_users")
+        users = [user.value for user in users]
+        response = {"command":"list_users", "count":len(users), "users":users}
+        returnValue(response)
 
+    @inlineCallbacks
     def add_vhost(self, vhostpath):
         """add new vhost"""
-        pass
+        vhostpath = Binary(vhostpath)
+        result = yield self.process.callRemote(self.nodename, self.module, "add_vhost", vhostpath)
+        response = {"command":"add_vhost", "vhostpath":vhostpath.value, "result":result.value}
+        returnValue(response)
 
+    @inlineCallbacks
     def delete_vhost(self, vhostpath):
         """delete vhost"""
-        pass
+        vhostpath = Binary(vhostpath)
+        result = yield self.process.callRemote(self.nodename, self.module, "delete_vhost", vhostpath)
+        response = {"command":"delete_vhost", "vhostpath":vhostpath.value, "result":result.value}
+        returnValue(response)
 
     @inlineCallbacks
     def list_vhosts(self):
         """list all vhosts"""
-        module = "rabbit_access_control"
-        vhosts = yield self.process.callRemote(self.nodename, module, "list_vhosts")
-        returnValue(vhosts)
+        vhosts = yield self.process.callRemote(self.nodename, self.module, "list_vhosts")
+        vhosts = [vhost.value for vhost in vhosts]
+        response = {"command":"list_vhosts", "count":len(vhosts), "vhosts":vhosts}
+        returnValue(response)
 
+    @inlineCallbacks
     def map_user_vhost(self, username, vhostpath):
         """allow access of user to vhost"""
-        pass
+        username, vhostpath = Binary(username), Binary(vhostpath)
+        result = yield self.process.callRemote(self.nodename, self.module, "map_user_vhost", username, vhostpath)
+        response = {"command":"map_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.value}
+        returnValue(response)
 
+    @inlineCallbacks
     def unmap_user_vhost(self, username, vhostpath): 
         """deny access of user to vhost"""
-        pass
+        username, vhostpath = Binary(username), Binary(vhostpath)
+        result = yield self.process.callRemote(self.nodename, self.module, "unmap_user_vhost", username, vhostpath)
+        response = {"command":"unmap_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.value}
+        returnValue(response)
 
+    @inlineCallbacks
     def list_user_vhosts(self, username): 
         """list all vhosts for user"""
-        pass
+        username = Binary(username)
+        result = yield self.process.callRemote(self.nodename, self.module, "list_user_vhosts", username)
+        #XXX check for failure: (<Atom at 0x2883690, text 'error'>, (<Atom at 0x2883710, text 'no_such_user'>,
+        vhosts = [vhost.value for vhost in result]
+        response = {"command":"list_user_vhosts", "username":username.value, "vhost":vhosts}
+        returnValue(response)
 
+    @inlineCallbacks
     def list_vhost_users(self, vhostpath): 
         """list all users in vhost"""
-        pass
+        vhostpath = Binary(vhostpath)
+        result = yield self.process.callRemote(self.nodename, self.module, "list_vhost_users", vhostpath)
+        users = [user.value for user in result]
+        response = {"command":"list_vhost_users", "vhostpath":vhostpath.value, "users":users}
+        returnValue(response)
 
+    @inlineCallbacks
+    def list_queues(self, vhostpath=None, queueinfoitem=None):
+        """list all queues"""
+        if vhostpath is None:
+            vhostpath = "/"
+        vhostpath = Binary(vhostpath)
+        if queueinfoitem is None:
+            infoitems = [Atom(item) for item in ["name", "durable", "auto_delete", "arguments", "pid", 
+            "messages_ready", "messages_unacknowledged", "messages_uncommitted", "messages", "acks_uncommitted", 
+            "consumers", "transactions", "memory"]]
+        result = yield self.process.callRemote(self.nodename, "rabbit_amqqueue", "info_all", vhostpath, infoitems)
+        info_all = []
+        for v in result:
+            info_all.append((v[0][1][3].value, 
+                {"name":v[0][1][3].value,
+                 "durable":v[1][1].text == "true",
+                 "auto_delete":v[2][1].text == "true",
+                 "arguments":v[3][1],
+                 "pid":v[4][1].nodeName.text,
+                 "messages_ready":v[5][1],
+                 "messages_unacknowledged":v[6][1],
+                 "messages_uncommitted":v[7][1],
+                 "messages":v[8][1],
+                 "acks_uncommitted":v[9][1],
+                 "memory":v[10][1],
+                 "transactions":v[11][1],
+                 "memory":v[12][1]}))
+        response = {"command":"list_queues", "vhostpath":vhostpath.value, "info_all":info_all}
+        returnValue(response)
 
+    @inlineCallbacks
+    def list_exchanges(self, vhostpath=None, exchangeinfoitem=None):
+        """list all exchanges"""
+        if vhostpath is None:
+            vhostpath = "/"
+        vhostpath = Binary(vhostpath)
+        if exchangeinfoitem is None:
+            infoitems = [Atom(item) for item in ["name", "type", "durable", "auto_delete", "arguments"]]
+        result = yield self.process.callRemote(self.nodename, "rabbit_exchange", "info_all", vhostpath, infoitems)
+        info_all = []
+        for v in result:
+            # [(exch1, infodict1), (exch2, infodict2), ...]
+            info_all.append((v[0][1][3].value, 
+                {"name":v[0][1][3].value,
+                 "type":v[1][1].text,
+                 "durable":v[2][1].text == "true",
+                 "auto_delete":v[3][1].text == "true",
+                 "arguments":v[4][1]}))
+        response = {"command":"list_exchanges", "vhostpath":vhostpath.value, "info_all":info_all}
+        returnValue(response)
+
+    @inlineCallbacks
+    def list_bindings(self, vhostpath):
+        """list all bindings"""
+        response = {"command":"list_bindings"}
+        returnValue(response)
+
+    @inlineCallbacks
+    def list_connections(self, connectioninfoitem=None):
+        """list all connections"""
+        response = {"command":"list_connections"}
+        print "CIIIIIIIIIIIIII ", connectioninfoitem, response
+        returnValue(response)
+        

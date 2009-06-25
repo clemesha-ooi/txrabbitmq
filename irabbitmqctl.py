@@ -48,7 +48,7 @@ class IRabbitMQControlService(Interface):
     def list_queues(vhostpath=None, queueinfoitem=None):
         """list all queues"""
 
-    def list_exchanges(vhostpath=None, queueinfoitem=None):
+    def list_exchanges(vhostpath=None, exchangeinfoitem=None):
         """list all exchanges"""
 
     def list_bindings(vhostpath=None):

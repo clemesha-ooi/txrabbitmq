@@ -1,3 +1,4 @@
+import sys
 from string import Template
 
 from twisted.web import resource, server
@@ -5,6 +6,15 @@ from twisted.web import resource, server
 from twisted.python import components
 from twisted.python import log
 from irabbitmqctl import IRabbitMQControlService
+
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        print "FAILED: You must install simplejson or use python2.6"
+        sys.exit(1)
 
 
 class Root(resource.Resource):
@@ -37,30 +47,12 @@ class RabbitMQControlWebUI(resource.Resource):
         namesAndDesc = IRabbitMQControlService.namesAndDescriptions()
         for name,command in namesAndDesc:
             info = command.getSignatureInfo()
-            print name
             self._commands.append("<p><b>%s</b> => %s</p>" % (name, str(info)))
             self.putChild(name, ControlCommand(self.service, name, info))
 
     def render_GET(self, request):
         allcommands = " ".join(self._commands)
         return allcommands
-        """
-        try:
-            listtype = request.args.get("list")[0]
-        except TypeError:
-            return "Try list attr"
-        print 'listtype => ', listtype
-        try:
-            d = getattr(self.service, "list_%s" % listtype)()
-            d.addCallback(self._success, request)
-            return server.NOT_DONE_YET
-        except AttributeError:
-            return "No such list_* method"
-        """
-
-    def _success(self, result, request):
-        request.write("result=> %s" % str(result))
-        request.finish()
 
 
 class ControlCommand(resource.Resource):
@@ -68,10 +60,14 @@ class ControlCommand(resource.Resource):
     """
     isLeaf = True
 
-    def __init__(self, service, commandname, commandinfo):
+    def __init__(self, service, commandname, commandinfo, serializer=None):
         self.service = service
         self.commandname = commandname
         self.commandinfo = commandinfo 
+        if serializer is None:
+            self.serializer = json.dumps
+        else:
+            self.serializer = serializer 
 
     def render(self, request):
         status, vals, opt = self._check_args(request)
@@ -87,13 +83,20 @@ class ControlCommand(resource.Resource):
             return "Method '%s' not allowed" % request.method
         
         #Call the Service with the required and optional args:
-        d = getattr(self.service, self.commandname)(*vals, **opt)
+        try:
+            d = getattr(self.service, self.commandname)(*vals, **opt)
+        except AttributeError:
+            #Set 500
+            return "No such command '%s'" % self.commandname
         d.addCallback(self._success, request)
         d.addErrback(self._error, request)
         return server.NOT_DONE_YET
 
     def _success(self, result, request):
-        request.write("result=> %s" % str(result))
+        #log.msg("ControlCommand._success result=> %s" % result)
+        response = self.serializer(result)
+        request.setHeader("content-type", "application/json")
+        request.write(response)
         request.finish()
 
     def _error(self, result, request):
@@ -122,15 +125,6 @@ class ControlCommand(resource.Resource):
 
 
 components.registerAdapter(RabbitMQControlWebUI, IRabbitMQControlService, resource.IResource)
-
-
-
-
-
-
-
-
-
 
 
 
