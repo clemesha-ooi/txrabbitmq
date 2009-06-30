@@ -1,21 +1,37 @@
 /* AGENTS is a global object, set in the source at render */
 
-function display_agents(){
-  $.each(AGENTS, function(k, v){
-    console.log(k, v);
-    $("#agent_listing").append($("<li>").text(k));
+function populate_dashboard(data){
+  var cmds = data.cmds;
+  var cmdinfo = data.cmdinfo;
+  $.each(cmds, function(k, v){
+    //console.log(k, v);
+    $("#allcommands").append($("<li>").text(v));
+    $("#main").append($("<p>").attr("id", v).attr("class", "runcommand").text(v));
+    add_command(v, cmdinfo[v])
   });
+  $(".runcommand").click(run_command);
 };
 
+function add_command(name, info) {
+    console.info(name);
+    console.log(info.required);
+    if (typeof(info.optional)) {
+        console.dir(info.optional);
+    }
+    console.log("-");
+}
 
-function message_console(){
-  $.each(AGENTS, function(k, v){
-    console.log(k, v);
-    var mhtml = $("<p>").text("Send 'Role,method,payload' message from "+k+": ").append($("<input>").attr("id", k).attr("type", "text"));
-    $("#send_messages").append($("<li>").html(mhtml));
-  });
-  $("#send_messages input").keydown(send_message);
-};
+function run_command(evt) {
+    var cmd = $(evt.target).attr("id");
+    console.log("cmd ", cmd);
+    $.ajax({
+      url: cmd,
+      type:"GET", /*"POST"*/
+      success:function(resp){
+        console.log(resp);
+      }
+    });
+}
 
 function send_message(evt) {
   //send message on Enter keydown
@@ -36,6 +52,9 @@ function send_message(evt) {
 
 
 $(document).ready(function(){
-  display_agents();
-  message_console();
+  //Get object that contains all control commands
+  $.getJSON("cmds", function(data){
+    console.log(data);
+    populate_dashboard(data);
+  });
 });

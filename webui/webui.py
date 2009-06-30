@@ -1,8 +1,7 @@
-import sys
+import os
 from string import Template
 
-from twisted.web import resource, server
-
+from twisted.web import resource, static, server
 from twisted.python import components
 from twisted.python import log
 from irabbitmqctl import IRabbitMQControlService
@@ -17,27 +16,25 @@ except ImportError:
         sys.exit(1)
 
 
-class Root(resource.Resource):
-
-
-    def render_GET(self, request):
-        tvals = {}
-        html = Template(open("static/index.html").read()).substitute(tvals)
-        return html
-
-
 class RabbitMQControlWebUI(resource.Resource):
 
-    def __init__(self, service):
+    def __init__(self, service, staticroot="webui/static"):
         resource.Resource.__init__(self)
         self.service = service
-        self._commands = []
+        self.staticroot = staticroot
+        self._commands = {}
         self._mapCommandsToResources()
+        self.putChild('static', static.File(self.staticroot))
+        self.putChild('cmds', static.Data(self._cmds(), "application/json"))
 
     def getChild(self, name, request):
         if name == '':
             return self
         return resource.Resource.getChild(self, name, request)
+    
+    def _cmds(self):
+        cmds = sorted(self._commands.keys())
+        return json.dumps({"cmds":cmds, "cmdinfo":self._commands})
 
     def _mapCommandsToResources(self):
         """Loop over all methods that are required 
@@ -47,12 +44,15 @@ class RabbitMQControlWebUI(resource.Resource):
         namesAndDesc = IRabbitMQControlService.namesAndDescriptions()
         for name,command in namesAndDesc:
             info = command.getSignatureInfo()
-            self._commands.append("<p><b>%s</b> => %s</p>" % (name, str(info)))
+            self._commands[name] = info
+            #add child resource that handles specific command:
             self.putChild(name, ControlCommand(self.service, name, info))
 
     def render_GET(self, request):
-        allcommands = " ".join(self._commands)
-        return allcommands
+        tvals = self._commands
+        tmpl = os.path.join(self.staticroot, "index.html")
+        html = Template(open(tmpl).read()).substitute(tvals)
+        return html
 
 
 class ControlCommand(resource.Resource):
@@ -64,10 +64,9 @@ class ControlCommand(resource.Resource):
         self.service = service
         self.commandname = commandname
         self.commandinfo = commandinfo 
-        if serializer is None:
+        self.serializer = serializer 
+        if self.serializer is None:
             self.serializer = json.dumps
-        else:
-            self.serializer = serializer 
 
     def render(self, request):
         status, vals, opt = self._check_args(request)

@@ -11,11 +11,7 @@ from webui.webui import RabbitMQControlWebUI
 
 WEBLOGPATH = "/tmp/txrabbitmqctl.web.%d.log" % int(time.time())
 
-try:
-    cookie = open(os.path.join(os.path.expanduser("~"), ".erlang.cookie.local")).read().strip()
-except IOError: 
-    print "\n***** Put the local RabbitMQ cookie here: '~/.erlang.cookie.local'*****"
-    sys.exit(1)
+cookie = open(os.path.join(os.path.expanduser("~"), ".erlang.cookie.local")).read().strip()
 nodeName = buildNodeName("twotp-rabbit")
 process = Process(nodeName, cookie)
 rservice = RabbitMQControlService(process)

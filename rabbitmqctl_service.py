@@ -7,6 +7,17 @@ from twotp.term import Binary, Atom
 from irabbitmqctl import IRabbitMQControlService
 
 
+QUEUE_INFO_ITEMS = ["name", "durable", "auto_delete", "arguments", "pid", 
+"messages_ready", "messages_unacknowledged", "messages_uncommitted", "messages", "acks_uncommitted", 
+"consumers", "transactions", "memory"]
+
+EXCHANGE_INFO_ITEMS = ["name", "type", "durable", "auto_delete", "arguments"]
+
+CONNECTION_INFO_ITEMS = ["node", "address", "port", "peer_address", 
+"peer_port", "state", "channels", "user", "vhost", "timeout", "frame_max",
+"recv_oct", "recv_cnt", "send_oct", "send_cnt", "send_pend"]
+
+
 class RabbitMQControlService(service.Service):
     """Service that communicates with RabbitMQ 
     via the Erlang node protocol. 
@@ -126,9 +137,7 @@ class RabbitMQControlService(service.Service):
             vhostpath = "/"
         vhostpath = Binary(vhostpath)
         if queueinfoitem is None:
-            infoitems = [Atom(item) for item in ["name", "durable", "auto_delete", "arguments", "pid", 
-            "messages_ready", "messages_unacknowledged", "messages_uncommitted", "messages", "acks_uncommitted", 
-            "consumers", "transactions", "memory"]]
+            infoitems = [Atom(item) for item in QUEUE_INFO_ITEMS]
         result = yield self.process.callRemote(self.nodename, "rabbit_amqqueue", "info_all", vhostpath, infoitems)
         info_all = []
         for v in result:
@@ -156,7 +165,7 @@ class RabbitMQControlService(service.Service):
             vhostpath = "/"
         vhostpath = Binary(vhostpath)
         if exchangeinfoitem is None:
-            infoitems = [Atom(item) for item in ["name", "type", "durable", "auto_delete", "arguments"]]
+            infoitems = [Atom(item) for item in EXCHANGE_INFO_ITEMS]
         result = yield self.process.callRemote(self.nodename, "rabbit_exchange", "info_all", vhostpath, infoitems)
         info_all = []
         for v in result:
@@ -171,15 +180,23 @@ class RabbitMQControlService(service.Service):
         returnValue(response)
 
     @inlineCallbacks
-    def list_bindings(self, vhostpath):
+    def list_bindings(self, vhostpath=None):
         """list all bindings"""
+        if vhostpath is None:
+            vhostpath = "/"
+        vhostpath = Binary(vhostpath)
         response = {"command":"list_bindings"}
+        result = yield self.process.callRemote(self.nodename, "rabbit_exchange", "list_bindings", vhostpath)
+        print "list_bindings", result
         returnValue(response)
 
     @inlineCallbacks
     def list_connections(self, connectioninfoitem=None):
         """list all connections"""
+        if connectioninfoitem is None:
+            infoitems = [Atom(item) for item in CONNECTION_INFO_ITEMS]
         response = {"command":"list_connections"}
-        print "CIIIIIIIIIIIIII ", connectioninfoitem, response
+        result = yield self.process.callRemote(self.nodename, "rabbit_networking", "connection_info_all", infoitems)
+        print "list_connections ", result
         returnValue(response)
         
