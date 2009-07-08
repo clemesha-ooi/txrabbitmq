@@ -1,0 +1,22 @@
+Start example
+---------------
+First shell:
+    $ orbited --config rabbitmq.cfg
+
+Second shell:
+    $ python data_producer.py
+
+
+Resources
+=========
+http://cometdaily.com/2008/10/10/scalable-real-time-web-architecture-part-2-a-live-graph-with-orbited-morbidq-and-jsio/
+http://orbited.org/
+http://www.morbidq.com/
+http://www.orbited.org/wiki/MorbidQ
+
+http://code.google.com/p/stomper/
+
+http://hg.rabbitmq.com/rabbitmq-stomp/
+https://dev.rabbitmq.com/wiki/StompGateway
+
+http://anirudhsanjeev.org/tutorialhow-to-django-comet-orbited-stomp-morbidq-jsio/

@@ -68,7 +68,7 @@ class RabbitMQControlService(service.Service):
         """list all users"""
         users = yield self.process.callRemote(self.nodename, self.module, "list_users")
         users = [user.value for user in users]
-        response = {"command":"list_users", "count":len(users), "users":users}
+        response = {"command":"list_users", "count":len(users), "result":users}
         returnValue(response)
 
     @inlineCallbacks
@@ -92,7 +92,7 @@ class RabbitMQControlService(service.Service):
         """list all vhosts"""
         vhosts = yield self.process.callRemote(self.nodename, self.module, "list_vhosts")
         vhosts = [vhost.value for vhost in vhosts]
-        response = {"command":"list_vhosts", "count":len(vhosts), "vhosts":vhosts}
+        response = {"command":"list_vhosts", "count":len(vhosts), "result":vhosts}
         returnValue(response)
 
     @inlineCallbacks
@@ -118,7 +118,7 @@ class RabbitMQControlService(service.Service):
         result = yield self.process.callRemote(self.nodename, self.module, "list_user_vhosts", username)
         #XXX check for failure: (<Atom at 0x2883690, text 'error'>, (<Atom at 0x2883710, text 'no_such_user'>,
         vhosts = [vhost.value for vhost in result]
-        response = {"command":"list_user_vhosts", "username":username.value, "vhost":vhosts}
+        response = {"command":"list_user_vhosts", "username":username.value, "result":vhosts}
         returnValue(response)
 
     @inlineCallbacks
@@ -127,7 +127,7 @@ class RabbitMQControlService(service.Service):
         vhostpath = Binary(vhostpath)
         result = yield self.process.callRemote(self.nodename, self.module, "list_vhost_users", vhostpath)
         users = [user.value for user in result]
-        response = {"command":"list_vhost_users", "vhostpath":vhostpath.value, "users":users}
+        response = {"command":"list_vhost_users", "vhostpath":vhostpath.value, "result":users}
         returnValue(response)
 
     @inlineCallbacks
@@ -155,7 +155,7 @@ class RabbitMQControlService(service.Service):
                  "memory":v[10][1],
                  "transactions":v[11][1],
                  "memory":v[12][1]}))
-        response = {"command":"list_queues", "vhostpath":vhostpath.value, "info_all":info_all}
+        response = {"command":"list_queues", "vhostpath":vhostpath.value, "result":info_all}
         returnValue(response)
 
     @inlineCallbacks
@@ -176,7 +176,7 @@ class RabbitMQControlService(service.Service):
                  "durable":v[2][1].text == "true",
                  "auto_delete":v[3][1].text == "true",
                  "arguments":v[4][1]}))
-        response = {"command":"list_exchanges", "vhostpath":vhostpath.value, "info_all":info_all}
+        response = {"command":"list_exchanges", "vhostpath":vhostpath.value, "result":info_all}
         returnValue(response)
 
     @inlineCallbacks
@@ -185,9 +185,28 @@ class RabbitMQControlService(service.Service):
         if vhostpath is None:
             vhostpath = "/"
         vhostpath = Binary(vhostpath)
-        response = {"command":"list_bindings"}
         result = yield self.process.callRemote(self.nodename, "rabbit_exchange", "list_bindings", vhostpath)
+        print
         print "list_bindings", result
+        info_all = []
+        for v in result:
+            exchange = v[0][3].value
+            if exchange == '':
+                print 'BBBB TYPE: ', "queue"
+            else:
+                print 'BBBB TYPE: ', "exchange"
+
+            print "vvvvvvvvvvvvvvvvvvvv[0][3].value  ", v[0][3].value
+            print "vvvvvvvvvvvvvvvvvvvv[1][2].text  ", v[1][2].text
+            print "vvvvvvvvvvvvvvvvvvvv[3][0]  ", v[3]
+            print "vvvvvvvvvvvvvvvvvvvv[3]  ", v[3]
+            info_all.append(("binding",
+                {"exchange":v[0][3].value,
+                "queue":v[1][2].text,
+                "routing_key":v[3],
+                "arguements":v[3]}))
+        print info_all
+        response = {"command":"list_bindings", "vhostpath":vhostpath.value, "result":info_all}
         returnValue(response)
 
     @inlineCallbacks
@@ -197,6 +216,11 @@ class RabbitMQControlService(service.Service):
             infoitems = [Atom(item) for item in CONNECTION_INFO_ITEMS]
         response = {"command":"list_connections"}
         result = yield self.process.callRemote(self.nodename, "rabbit_networking", "connection_info_all", infoitems)
+        print
         print "list_connections ", result
+        for e in result:
+            print 
+            print len(e), e
+            print
+        print
         returnValue(response)
-        

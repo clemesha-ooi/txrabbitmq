@@ -13,6 +13,9 @@ p.title {
   background-color:#e3e3e3;
   border-bottom: 1px solid #9e9e9e;
 }
+p.runcommand {
+    margin-left:8px;
+}
 #left_sidebar, #main {
   border: 1px solid #9e9e9e;
   font-size:120%;

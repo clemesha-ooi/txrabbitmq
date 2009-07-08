@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="http://amoeba.ucsd.edu:9000/static/Orbited.js"></script>
+<script src="http://amoeba.ucsd.edu:9000/static/JSON.js"></script>
+<script>TCPSocket = Orbited.TCPSocket</script>
+<script src="http://amoeba.ucsd.edu:9000/static/protocols/stomp/stomp.js"></script>
+<script type="text/javascript">
+
+function show_diff(data){
+  data = JSON.parse(data);
+  console.log(data);
+  $("#container").empty();
+  $.each(data, function(k, v){
+    console.log(k);
+    var cnt = $("<h5>").text(k).append($("<p>").text(v.result+" "));
+    $("#container").append(cnt);
+  });
+}
+
+$(document).ready(function(){
+
+    client = new STOMPClient();
+    client.onopen = function() { };
+    client.onclose = function(c) { console.log('Lost Connection, Code: ' + c);};
+    client.onerror = function(error) { console.log("Error: " + error); };
+    client.onerrorframe = function(frame) { console.log("Error: " + frame.body); };
+    client.onconnectedframe = function() { client.subscribe("/topic/rabbitmqctl"); };
+
+    client.onmessageframe = function(frame) {
+        //check frame.headers.destination?
+      f = frame;
+       show_diff(frame.body);
+    };
+
+    client.connect('localhost', 61613);
+
+});
+</script>
+<style>
+    body, html, h1 {
+        margin: 0px;
+        padding: 0px;
+        font-family: sans-serif;
+    }
+ 
+    #container {
+        margin: auto;
+        width: 800px;
+        border: 2px solid #DFDFDF;
+        background-color:#EFEFEF;
+    }
+   p {
+    font-weight:normal;
+   }
+</style>
+</head>
+
+<body>
+<div id="container"></div>
+</body>
+</html>
+
