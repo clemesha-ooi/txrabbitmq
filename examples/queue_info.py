@@ -50,7 +50,7 @@ def queue_info(process):
         print "Got error", error
         reactor.stop()
 
-    process.callRemote("rabbit", "rabbit_amqqueue", "info_all", VHOST, INFO_ARGS).addCallback(cb).addErrback(eb)
+    process.callRemote("rabbit", "rabbit_amqqueue", "info_all", VHOST, INFO_ARGS).addCallbacks(cb, eb)
 
 
 if __name__ == "__main__":

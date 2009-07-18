@@ -9,6 +9,7 @@ from twotp import Process, readCookie, buildNodeName
 from rabbitmqctl_service import RabbitMQControlService
 from webui.webui import RabbitMQControlWebUI
 
+PORT = 8888
 WEBLOGPATH = "/tmp/txrabbitmqctl.web.%d.log" % int(time.time())
 
 cookie = open(os.path.join(os.path.expanduser("~"), ".erlang.cookie.local")).read().strip()
@@ -19,5 +20,5 @@ site = server.Site(resource.IResource(rservice), logPath=WEBLOGPATH)
 
 application = service.Application('rabbitmqctl')
 serviceCollection = service.IServiceCollection(application)
-internet.TCPServer(8000, site).setServiceParent(serviceCollection)
+internet.TCPServer(PORT, site).setServiceParent(serviceCollection)
 

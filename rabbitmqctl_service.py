@@ -186,26 +186,15 @@ class RabbitMQControlService(service.Service):
             vhostpath = "/"
         vhostpath = Binary(vhostpath)
         result = yield self.process.callRemote(self.nodename, "rabbit_exchange", "list_bindings", vhostpath)
-        print
-        print "list_bindings", result
         info_all = []
         for v in result:
             exchange = v[0][3].value
-            if exchange == '':
-                print 'BBBB TYPE: ', "queue"
-            else:
-                print 'BBBB TYPE: ', "exchange"
-
-            print "vvvvvvvvvvvvvvvvvvvv[0][3].value  ", v[0][3].value
-            print "vvvvvvvvvvvvvvvvvvvv[1][2].text  ", v[1][2].text
-            print "vvvvvvvvvvvvvvvvvvvv[3][0]  ", v[3]
-            print "vvvvvvvvvvvvvvvvvvvv[3]  ", v[3]
-            info_all.append(("binding",
-                {"exchange":v[0][3].value,
-                "queue":v[1][2].text,
-                "routing_key":v[3],
-                "arguements":v[3]}))
-        print info_all
+            if exchange: # if exchange=='', then we just have a queue listing, not a binding.
+                info_all.append(("binding",
+                    {"queue":v[1][3].value,
+                    "exchange":exchange,
+                    "routing_key":v[2].value,
+                    "arguements":v[3]}))
         response = {"command":"list_bindings", "vhostpath":vhostpath.value, "result":info_all}
         returnValue(response)
 
