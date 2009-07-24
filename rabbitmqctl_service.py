@@ -43,8 +43,7 @@ class RabbitMQControlService(service.Service):
         """add new user with given password"""
         username, password = Binary(username), Binary(password)
         result = yield self.process.callRemote(self.nodename, self.module, "add_user", username, password)
-        print result
-        response = {"command":"add_user", "username":username.value, "result":result.value}
+        response = {"command":"add_user", "username":username.value, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
@@ -52,7 +51,7 @@ class RabbitMQControlService(service.Service):
         """delete user"""
         username = Binary(username)
         result = yield self.process.callRemote(self.nodename, self.module, "delete_user", username)
-        response = {"command":"delete_user", "username":username.value, "result":result.value}
+        response = {"command":"delete_user", "username":username.value, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
@@ -74,17 +73,15 @@ class RabbitMQControlService(service.Service):
     @inlineCallbacks
     def add_vhost(self, vhostpath):
         """add new vhost"""
-        vhostpath = Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, self.module, "add_vhost", vhostpath)
-        response = {"command":"add_vhost", "vhostpath":vhostpath.value, "result":result.value}
+        result = yield self.process.callRemote(self.nodename, self.module, "add_vhost", Binary(vhostpath))
+        response = {"command":"add_vhost", "vhostpath":vhostpath, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
     def delete_vhost(self, vhostpath):
         """delete vhost"""
-        vhostpath = Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, self.module, "delete_vhost", vhostpath)
-        response = {"command":"delete_vhost", "vhostpath":vhostpath.value, "result":result.value}
+        result = yield self.process.callRemote(self.nodename, self.module, "delete_vhost", Binary(vhostpath))
+        response = {"command":"delete_vhost", "vhostpath":vhostpath, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
