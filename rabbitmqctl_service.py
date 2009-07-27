@@ -59,7 +59,7 @@ class RabbitMQControlService(service.Service):
         """change user password"""
         username, password = Binary(username), Binary(password)
         result = yield self.process.callRemote(self.nodename, self.module, "change_password", username, password)
-        response = {"command":"change_password", "username":username.value, "result":result.value}
+        response = {"command":"change_password", "username":username.value, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
@@ -97,7 +97,7 @@ class RabbitMQControlService(service.Service):
         """allow access of user to vhost"""
         username, vhostpath = Binary(username), Binary(vhostpath)
         result = yield self.process.callRemote(self.nodename, self.module, "map_user_vhost", username, vhostpath)
-        response = {"command":"map_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.value}
+        response = {"command":"map_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
@@ -105,7 +105,7 @@ class RabbitMQControlService(service.Service):
         """deny access of user to vhost"""
         username, vhostpath = Binary(username), Binary(vhostpath)
         result = yield self.process.callRemote(self.nodename, self.module, "unmap_user_vhost", username, vhostpath)
-        response = {"command":"unmap_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.value}
+        response = {"command":"unmap_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
@@ -202,11 +202,5 @@ class RabbitMQControlService(service.Service):
             infoitems = [Atom(item) for item in CONNECTION_INFO_ITEMS]
         response = {"command":"list_connections"}
         result = yield self.process.callRemote(self.nodename, "rabbit_networking", "connection_info_all", infoitems)
-        print
         print "list_connections ", result
-        for e in result:
-            print 
-            print len(e), e
-            print
-        print
         returnValue(response)
