@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+
+"""
+@file README.py
+@author Alex Clemesha
+@date 8/18/09
+
 @mainpage 
 txrabbitmq - RabbitMQ's 'rabbitmqctl' as a Twisted Service.
 
@@ -31,14 +38,14 @@ RESTful Command / Data view
 Push data from RabbitMQ
 -----------------------
 
-* From top-level dir run: 
+-# From top-level dir run: 
 
 @code
     $ twistd -n restrabbitmqctl
 @endcode
 
 
-* Open 2 shells to dir `webui/push` and run:
+-# Open 2 shells to dir `webui/push` and run:
 
 @code
     $ python data_producer.py #first shell
@@ -46,4 +53,7 @@ Push data from RabbitMQ
 @endcode
 
 
-* Open ports 8000 and 9000, to see commands data and push, respectively
+-# Open ports 8000 and 9000, to see commands data and push, respectively
+"""
+
+print 'foo'
