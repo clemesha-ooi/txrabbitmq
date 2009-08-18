@@ -1,4 +1,5 @@
-@mainpage txrabbitmq - RabbitMQ's 'rabbitmqctl' as a Twisted Service.
+@mainpage 
+txrabbitmq - RabbitMQ's 'rabbitmqctl' as a Twisted Service.
 
 
 @section Overview
