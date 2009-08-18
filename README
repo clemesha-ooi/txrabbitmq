@@ -1,33 +1,30 @@
-===========================================================
-txrabbitmq - RabbitMQ's 'rabbitmqctl' as a Twisted Service.
-===========================================================
+@mainpage txrabbitmq - RabbitMQ's 'rabbitmqctl' as a Twisted Service.
 
 
-Overview
-========
+@section Overview
 
 Implements RabbitMQ's 'rabbitmqctl' command line tool as a Twisted Service, 
 Expose this functionality over several protocols, most importantly: HTTP and AMQP.
 
 
-Install
-=======
+@section Install
 
 The recommend way of using `txrabbit` is to create a `virtualenv` and
 the install all dependencies with `pip` into the `virtualenv`
 ----------------------------------------------------------------
-
+@code
     $ virtualenv --no-site-packages txrabbitmq_env 
     $ pip -E txrabbitmq_env install -U twotp orbited twisted simplejson stompservice
+@endcode
 
 
+@section Usage
 
-Usage
-=====
-
-Command / Data view
--------------------
-    $ twistd -ny webui-example.tac.py
+RESTful Command / Data view
+---------------------------
+@code
+    $ twistd -n restrabbitmqctl
+@endcode
 
 
 Push data from RabbitMQ
@@ -35,20 +32,17 @@ Push data from RabbitMQ
 
 * From top-level dir run: 
 
-    $ twistd -ny webui-example.tac.py
+@code
+    $ twistd -n restrabbitmqctl
+@endcode
 
 
 * Open 2 shells to dir `webui/push` and run:
 
+@code
     $ python data_producer.py #first shell
     $ orbited --config=rabbitmq.cfg #second shell
+@endcode
 
 
 * Open ports 8000 and 9000, to see commands data and push, respectively
-
-
-Source on amoeba
-================
-amoeba.ucsd.edu
-
-

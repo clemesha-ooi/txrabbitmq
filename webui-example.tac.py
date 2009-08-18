@@ -12,7 +12,7 @@ from webui.webui import RabbitMQControlWebUI
 PORT = 8888
 WEBLOGPATH = "/tmp/txrabbitmqctl.web.%d.log" % int(time.time())
 
-cookie = open(os.path.join(os.path.expanduser("~"), ".erlang.cookie.local")).read().strip()
+cookie = readCookie()
 nodeName = buildNodeName("twotp-rabbit")
 process = Process(nodeName, cookie)
 rservice = RabbitMQControlService(process)

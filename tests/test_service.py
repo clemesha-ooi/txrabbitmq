@@ -21,7 +21,7 @@ class TestRabbitMQControlService(unittest.TestCase):
     """ 
 
     def setUp(self):
-        cookie = open(os.path.join(os.path.expanduser("~"), ".erlang.cookie.local")).read().strip()
+        cookie = readCookie()
         nodeName = buildNodeName("test-txrabbitmq")
         self.process = Process(nodeName, cookie)
         self.service = RabbitMQControlService(self.process)
