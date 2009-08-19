@@ -32,14 +32,14 @@ the install all dependencies with `pip` into the `virtualenv`
 
 @section Usage
 
-@subsection  Start up the RESTful Command/Data http service:
+@subsection - Start up the RESTful Command/Data http service:
 
 From top-level package directory run: 
 @code
     $ twistd -n txrabbitmq
 @endcode
 
-@subsection  Push data from RabbitMQ
+@subsection - Push data from RabbitMQ
 
 From top-level package directory run: 
 @code
