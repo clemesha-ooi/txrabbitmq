@@ -1,2 +1,2 @@
 *.pyc
-.erlang.cookie.local
+twisted/plugins/dropin.cache

@@ -23,15 +23,15 @@ from webui.webui import RabbitMQControlWebUI
 class RESTRabbitmqctlOptions(Options):
     optParameters = [
         ['cookie', 'c', '', 'Erlang cookie value'],
-        ['nodename', 'n', 'restrabbitmqctl', 'Name of the node'],
-        ['port', 'p', '8888', 'HTTP port for the RESTful rabbitmqctl']
+        ['nodename', 'n', 'txrabbitmq', 'Name of the node'],
+        ['port', 'p', '8888', 'HTTP port for the RESTful rabbitmqctl service']
     ]
 
 
 class RESTRabbitmqctlPlugin(object):
     implements(IPlugin, IServiceMaker)
 
-    tapname = "restrabbitmqctl"
+    tapname = "txrabbitmq"
     description = "RESTful interface to rabbitmqctl."
     options = RESTRabbitmqctlOptions
 
