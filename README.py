@@ -17,6 +17,11 @@ Expose this functionality over several protocols, most importantly: HTTP and AMQ
 
 @section Install
 
+Get the latest code:
+@code
+    $ git clone git@amoeba.ucsd.edu:txrabbitmq.git
+@endcode
+
 The recommend way of using `txrabbitmq` is to create a `virtualenv` and
 the install all dependencies with `pip` into the `virtualenv`
 @code
@@ -27,18 +32,21 @@ the install all dependencies with `pip` into the `virtualenv`
 
 @section Usage
 
-@subsection Start up the RESTful Command/Data http service:
+@subsection  Start up the RESTful Command/Data http service:
+
+From top-level package directory run: 
 @code
     $ twistd -n txrabbitmq
 @endcode
 
-@subsection Push data from RabbitMQ
-From top-level dir run: 
+@subsection  Push data from RabbitMQ
+
+From top-level package directory run: 
 @code
     $ twistd -n txrabbitmq
 @endcode
 
-Open 2nd shell, navigate to dir `webui/push` and run:
+Open 2nd shell, navigate to the directory `webui/push` and run:
 @code
     $ python data_producer.py #first shell
     $ orbited --config=rabbitmq.cfg #second shell
