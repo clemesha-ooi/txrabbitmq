@@ -30,7 +30,7 @@ the install all dependencies with `pip` into the `virtualenv`
 @endcode
 
 
-@section Usage: Start up the RESTful Command/Data http service:
+@section Start up the RESTful Command/Data http service:
 
 From top-level package directory run: 
 @code
@@ -38,7 +38,7 @@ From top-level package directory run:
 @endcode
 
 
-@section Usage: Get realtime data from RabbitMQ:
+@section Get realtime data from RabbitMQ:
 
 From top-level package directory run: 
 @code
