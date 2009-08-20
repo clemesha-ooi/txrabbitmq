@@ -1,0 +1,2 @@
+git archive --format=tar --prefix=txrabbitmq/ HEAD | gzip > txrabbitmq-latest.tar.gz
+scp txrabbitmq-latest.tar.gz amoeba:~/cpe/resources
