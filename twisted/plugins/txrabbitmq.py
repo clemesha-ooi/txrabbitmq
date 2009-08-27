@@ -39,7 +39,6 @@ class RESTRabbitmqctlPlugin(object):
         cookie = options['cookie']
         if not cookie:
             cookie = readCookie()
-        print cookie
         nodeName = buildNodeName(options['nodename'])
         process = Process(nodeName, cookie)
         rservice = RabbitMQControlService(process)

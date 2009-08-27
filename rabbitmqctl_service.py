@@ -1,3 +1,4 @@
+import socket
 from twisted.application import service
 from twisted.internet.defer import inlineCallbacks, returnValue
 from zope.interface import Interface, implements
@@ -200,7 +201,30 @@ class RabbitMQControlService(service.Service):
         """list all connections"""
         if connectioninfoitem is None:
             infoitems = [Atom(item) for item in CONNECTION_INFO_ITEMS]
-        response = {"command":"list_connections"}
-        result = yield self.process.callRemote(self.nodename, "rabbit_networking", "connection_info_all", infoitems)
-        print "list_connections ", result
+        result = yield self.process.callRemote(self.nodename, "rabbit_networking", "connection_info_all")#, infoitems)
+        info_all = []
+        for v in result:
+            address = ".".join([str(e) for e in v[1][1]])
+            peer_address = ".".join([str(e) for e in v[3][1]])
+            info_all.append({
+                "pid":v[0][1].nodeName.text,
+                "address":address,
+                "host":socket.gethostbyaddr(address)[0],
+                "port":str(v[2][1]),
+                "peer_address":peer_address,
+                "peer_host":socket.gethostbyaddr(peer_address)[0],
+                "peer_port":str(v[4][1]),
+                "recv_oct":str(v[5][1]),
+                "recv_cnt":str(v[6][1]),
+                "send_oct":str(v[7][1]),
+                "send_cnt":str(v[8][1]),
+                "send_pend":str(v[9][1]),
+                "state":v[10][1].text,
+                "channels":str(v[11][1]),
+                "user":v[12][1].value,
+                "vhost":v[13][1].value,
+                "timeout":str(v[14][1]),
+                "frame_max":str(v[15][1])
+            })
+        response = {"command":"list_connections", "result":info_all}
         returnValue(response)
