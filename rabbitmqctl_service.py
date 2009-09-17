@@ -94,38 +94,54 @@ class RabbitMQControlService(service.Service):
         returnValue(response)
 
     @inlineCallbacks
-    def map_user_vhost(self, username, vhostpath):
-        """allow access of user to vhost"""
+    def set_permissions(self, username, vhostpath, config_regex, write_regex, read_regex):
+        """set permission of a user to broker resources"""
+        username, vhostpath = Binary(username), Binary(vhostpath), Binary(config_regex), Binary(write_regex), Binary(read_regex)
+        result = yield self.process.callRemote(self.nodename, self.module, "set_permissions", username, \
+                 vhostpath, config_regex, write_regex, read_regex)
+        response = {"command":"set_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
+        returnValue(response)
+
+    @inlineCallbacks
+    def clear_permissions(self, username, vhostpath): 
+        """clear user permissions"""
         username, vhostpath = Binary(username), Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, self.module, "map_user_vhost", username, vhostpath)
-        response = {"command":"map_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
+        result = yield self.process.callRemote(self.nodename, self.module, "clear_permissions", username, vhostpath)
+        response = {"command":"clear_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
-    def unmap_user_vhost(self, username, vhostpath): 
-        """deny access of user to vhost"""
-        username, vhostpath = Binary(username), Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, self.module, "unmap_user_vhost", username, vhostpath)
-        response = {"command":"unmap_user_vhost", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
-        returnValue(response)
-
-    @inlineCallbacks
-    def list_user_vhosts(self, username): 
-        """list all vhosts for user"""
-        username = Binary(username)
-        result = yield self.process.callRemote(self.nodename, self.module, "list_user_vhosts", username)
-        #XXX check for failure: (<Atom at 0x2883690, text 'error'>, (<Atom at 0x2883710, text 'no_such_user'>,
-        vhosts = [vhost.value for vhost in result]
-        response = {"command":"list_user_vhosts", "username":username.value, "result":vhosts}
-        returnValue(response)
-
-    @inlineCallbacks
-    def list_vhost_users(self, vhostpath): 
-        """list all users in vhost"""
+    def list_vhost_permissions(self, vhostpath=None): 
+        """list all users permissions"""
+        if vhostpath is None:
+            vhostpath = "/"
         vhostpath = Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, self.module, "list_vhost_users", vhostpath)
-        users = [user.value for user in result]
-        response = {"command":"list_vhost_users", "vhostpath":vhostpath.value, "result":users}
+        result = yield self.process.callRemote(self.nodename, self.module, "list_vhost_permissions", vhostpath)
+        result_all = {}
+        for v in result:
+            username = v[0].value
+            config_regex = v[1].value
+            write_regex = v[2].value
+            read_regex = v[3].value
+            result_all[(username, vhostpath.value)] = [config_regex, write_regex, read_regex]
+        response = {"command":"list_vhost_permissions", "vhostpath":vhostpath.value, "result":result_all}
+        returnValue(response)
+
+    @inlineCallbacks
+    def list_user_permissions(self, username=None): 
+        """list all users permissions"""
+        if username is None:
+            username = "guest"
+        username = Binary(username)
+        result = yield self.process.callRemote(self.nodename, self.module, "list_user_permissions", username)
+        result_all = {}
+        for v in result:
+            vhostpath = v[0].value
+            config_regex = v[1].value
+            write_regex = v[2].value
+            read_regex = v[3].value
+            result_all[(vhostpath, username.value)] = [config_regex, write_regex, read_regex]
+        response = {"command":"list_user_permissions", "vhostpath":username.value, "result":result_all}
         returnValue(response)
 
     @inlineCallbacks

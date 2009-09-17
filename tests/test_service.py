@@ -45,20 +45,6 @@ class TestRabbitMQControlService(unittest.TestCase):
         self.failUnless("/" in vhosts["result"])
 
     @inlineCallbacks
-    def test_list_user_vhosts(self):
-        vhosts = yield self.service.list_user_vhosts("guest")
-        self.failUnless(vhosts["username"] == "guest")
-        self.failUnless(vhosts["command"] == "list_user_vhosts")
-        self.failUnless("/" in vhosts["result"])
-
-    @inlineCallbacks
-    def test_list_vhost_users(self):
-        users = yield self.service.list_vhost_users("/")
-        self.failUnless(users["vhostpath"] == "/")
-        self.failUnless(users["command"] == "list_vhost_users")
-        self.failUnless("guest" in users["result"])
-
-    @inlineCallbacks
     def test_add_changepassword_delete_user(self):
         """New user test.
         Add a new user, change new user's password, delete new user.
@@ -93,42 +79,38 @@ class TestRabbitMQControlService(unittest.TestCase):
         self.failUnless(delete_vhost["result"] == "ok")
 
     @inlineCallbacks
-    def test_map_unmap_user_vhost(self):
-        """Map and unmap user to vhost test.
-        Add a new vhost, map and unmap user to vhost, delete new vhost.
-        """
-        add_vhost = yield self.service.add_vhost("test_vhost_path")
+    def test_list_vhost_permissions(self):
+        """Test list all vhost permissions"""
+        list_vhost_permissions = yield self.service.list_vhost_permissions()
+        self.failUnless(list_vhost_permissions["command"] == "list_vhost_permissions")
+        result = list_vhost_permissions["result"]
+        self.failUnless(result[('guest', '/')] == ['.*', '.*', '.*'])
 
-        map_user_vhost = yield self.service.map_user_vhost("guest", "test_vhost_path")
-        self.failUnless(map_user_vhost["command"] == "map_user_vhost")
-        self.failUnless(map_user_vhost["username"] == "guest")
-        self.failUnless(map_user_vhost["vhostpath"] == "test_vhost_path")
-        self.failUnless(map_user_vhost["result"] == "ok")
-
-        unmap_user_vhost = yield self.service.unmap_user_vhost("guest", "test_vhost_path")
-        self.failUnless(unmap_user_vhost["command"] == "unmap_user_vhost")
-        self.failUnless(unmap_user_vhost["username"] == "guest")
-        self.failUnless(unmap_user_vhost["vhostpath"] == "test_vhost_path")
-        self.failUnless(unmap_user_vhost["result"] == "ok")
-
-        delete_vhost = yield self.service.delete_vhost("test_vhost_path")
+    @inlineCallbacks
+    def test_list_user_permissions(self):
+        """Test list all users permissions"""
+        list_user_permissions = yield self.service.list_user_permissions()
+        self.failUnless(list_user_permissions["command"] == "list_user_permissions")
+        result = list_user_permissions["result"]
+        self.failUnless(result[('/', 'guest')] == ['.*', '.*', '.*'])
  
     @inlineCallbacks
     def test_list_queues(self):
         list_queues = yield self.service.list_queues()
-        print list_queues
- 
+        self.failUnless(list_queues["vhostpath"] == "/")
+        self.failUnless(list_queues["command"] == "list_queues")
+
     @inlineCallbacks
     def test_list_exchanges(self):
         list_exchanges = yield self.service.list_exchanges()
-        print list_exchanges
+        #print list_exchanges
 
     @inlineCallbacks
     def test_list_bindings(self):
         list_bindings = yield self.service.list_bindings()
-        print list_bindings
+        #print list_bindings
 
     @inlineCallbacks
     def test_list_connections(self):
         list_connections = yield self.service.list_connections()
-        print list_connections
+        #print list_connections
