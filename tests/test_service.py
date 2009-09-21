@@ -90,7 +90,7 @@ class TestRabbitMQControlService(unittest.TestCase):
 
         list_vhost_permissions = yield self.service.list_vhost_permissions()
         permissions_result = list_vhost_permissions["result"]
-        self.failUnless(permissions_result[(_test_username, '/')] == ['.*', '.*', '.*'])
+        self.failUnless(permissions_result[_test_username] == ['/', '.*', '.*', '.*'])
 
         clear_permissions = yield self.service.clear_permissions(_test_username)
         self.failUnless(clear_permissions["result"].text == "ok")
@@ -102,7 +102,7 @@ class TestRabbitMQControlService(unittest.TestCase):
         list_vhost_permissions = yield self.service.list_vhost_permissions()
         self.failUnless(list_vhost_permissions["command"] == "list_vhost_permissions")
         result = list_vhost_permissions["result"]
-        self.failUnless(result[('guest', '/')] == ['.*', '.*', '.*'])
+        self.failUnless(result['guest'] == ['/', '.*', '.*', '.*'])
 
     @inlineCallbacks
     def test_list_user_permissions(self):
@@ -110,7 +110,7 @@ class TestRabbitMQControlService(unittest.TestCase):
         list_user_permissions = yield self.service.list_user_permissions()
         self.failUnless(list_user_permissions["command"] == "list_user_permissions")
         result = list_user_permissions["result"]
-        self.failUnless(result[('/', 'guest')] == ['.*', '.*', '.*'])
+        self.failUnless(result['/'] == ['guest', '.*', '.*', '.*'])
  
     @inlineCallbacks
     def test_list_queues(self):

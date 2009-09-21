@@ -128,7 +128,7 @@ class RabbitMQControlService(service.Service):
             config_regex = v[1].value
             write_regex = v[2].value
             read_regex = v[3].value
-            result_all[(username, vhostpath.value)] = [config_regex, write_regex, read_regex]
+            result_all[username] = [vhostpath.value, config_regex, write_regex, read_regex]
         response = {"command":"list_vhost_permissions", "vhostpath":vhostpath.value, "result":result_all}
         returnValue(response)
 
@@ -145,7 +145,7 @@ class RabbitMQControlService(service.Service):
             config_regex = v[1].value
             write_regex = v[2].value
             read_regex = v[3].value
-            result_all[(vhostpath, username.value)] = [config_regex, write_regex, read_regex]
+            result_all[vhostpath] = [username.value, config_regex, write_regex, read_regex]
         response = {"command":"list_user_permissions", "vhostpath":username.value, "result":result_all}
         returnValue(response)
 

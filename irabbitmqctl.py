@@ -33,17 +33,17 @@ class IRabbitMQControlService(Interface):
     def list_vhosts():
         """list all vhosts"""
 
-    def map_user_vhost(username, vhostpath):
-        """allow access of user to vhost"""
+    def set_permissions(username, config_regex, write_regex, read_regex, vhostpath=None):
+        """set permission of a user to broker resources"""
 
-    def unmap_user_vhost(username, vhostpath):
-        """deny access of user to vhost"""
+    def clear_permissions(username, vhostpath=None): 
+        """clear user permissions"""
 
-    def list_user_vhosts(username):
-        """list all vhosts for user"""
+    def list_vhost_permissions(vhostpath=None): 
+        """list all users permissions"""
 
-    def list_vhost_users(vhostpath):
-        """list all users in vhost"""
+    def list_user_permissions(username=None): 
+        """list all users permissions"""
 
     def list_queues(vhostpath=None, queueinfoitem=None):
         """list all queues"""
