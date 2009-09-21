@@ -94,20 +94,25 @@ class RabbitMQControlService(service.Service):
         returnValue(response)
 
     @inlineCallbacks
-    def set_permissions(self, username, vhostpath, config_regex, write_regex, read_regex):
+    def set_permissions(self, username, config_regex, write_regex, read_regex, vhostpath=None):
         """set permission of a user to broker resources"""
-        username, vhostpath = Binary(username), Binary(vhostpath), Binary(config_regex), Binary(write_regex), Binary(read_regex)
+        if vhostpath is None:
+            vhostpath = "/"
+        username, vhostpath, config_regex, write_regex, read_regex = Binary(username), Binary(vhostpath), \
+                 Binary(config_regex), Binary(write_regex), Binary(read_regex)
         result = yield self.process.callRemote(self.nodename, self.module, "set_permissions", username, \
                  vhostpath, config_regex, write_regex, read_regex)
-        response = {"command":"set_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
+        response = {"command":"set_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result}
         returnValue(response)
 
     @inlineCallbacks
-    def clear_permissions(self, username, vhostpath): 
+    def clear_permissions(self, username, vhostpath=None): 
         """clear user permissions"""
+        if vhostpath is None:
+            vhostpath = "/"
         username, vhostpath = Binary(username), Binary(vhostpath)
         result = yield self.process.callRemote(self.nodename, self.module, "clear_permissions", username, vhostpath)
-        response = {"command":"clear_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result.text}
+        response = {"command":"clear_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result}
         returnValue(response)
 
     @inlineCallbacks

@@ -79,6 +79,24 @@ class TestRabbitMQControlService(unittest.TestCase):
         self.failUnless(delete_vhost["result"] == "ok")
 
     @inlineCallbacks
+    def test_set_clear_permission(self):
+        """Test setting and clearing permissions for a user.
+    Create a test user, set permissions, test permissions, clear permission, delete test user.
+    """
+        _test_username = "test_temp_user"
+        add_user = yield self.service.add_user(_test_username, "test_temp_password")
+        set_permissions = yield self.service.set_permissions(_test_username, ".*", ".*", ".*")
+        self.failUnless(set_permissions["result"].text == "ok")
+
+        list_vhost_permissions = yield self.service.list_vhost_permissions()
+        permissions_result = list_vhost_permissions["result"]
+        self.failUnless(permissions_result[(_test_username, '/')] == ['.*', '.*', '.*'])
+
+        clear_permissions = yield self.service.clear_permissions(_test_username)
+        self.failUnless(clear_permissions["result"].text == "ok")
+        delete_user = yield self.service.delete_user(_test_username)
+
+    @inlineCallbacks
     def test_list_vhost_permissions(self):
         """Test list all vhost permissions"""
         list_vhost_permissions = yield self.service.list_vhost_permissions()
@@ -96,21 +114,33 @@ class TestRabbitMQControlService(unittest.TestCase):
  
     @inlineCallbacks
     def test_list_queues(self):
+        #Create dynamic queue here for better test case?
         list_queues = yield self.service.list_queues()
         self.failUnless(list_queues["vhostpath"] == "/")
         self.failUnless(list_queues["command"] == "list_queues")
 
     @inlineCallbacks
     def test_list_exchanges(self):
+        broker_default_exchanges = ['amq.rabbitmq.log', 'amq.match', 'amq.headers', 'amq.topic', 'amq.direct', 'amq.fanout']
         list_exchanges = yield self.service.list_exchanges()
-        #print list_exchanges
+        self.failUnless(list_exchanges["vhostpath"] == "/")
+        self.failUnless(list_exchanges["command"] == "list_exchanges")
+        result = list_exchanges["result"]
+        existing_default_exchanges = []
+        for e in result:
+            if e[0].startswith("amq."):
+                existing_default_exchanges.append(e[0])
+        self.failUnless(existing_default_exchanges == broker_default_exchanges)
 
     @inlineCallbacks
     def test_list_bindings(self):
+        #Create dynamic binding here for better test case?
         list_bindings = yield self.service.list_bindings()
-        #print list_bindings
+        self.failUnless(list_bindings["vhostpath"] == "/")
+        self.failUnless(list_bindings["command"] == "list_bindings")
 
     @inlineCallbacks
     def test_list_connections(self):
+        #Create dynamic connection here for better test case?
         list_connections = yield self.service.list_connections()
-        #print list_connections
+        self.failUnless(list_connections["command"] == "list_connections")
