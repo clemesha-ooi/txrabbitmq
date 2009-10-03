@@ -12,20 +12,44 @@ p.title {
   margin-bottom:12px;
   background-color:#e3e3e3;
   border-bottom: 1px solid #9e9e9e;
+  font-size:120%;
 }
 p.runcommand {
     margin-left:8px;
 }
-#left_sidebar, #main {
+#configuration, #commands, #management {
   border: 1px solid #9e9e9e;
-  font-size:120%;
-}
-#left_sidebar ul {
   margin-bottom:12px;
+  -webkit-border-radius:3px;
+  -moz-border-radius:3px; 
+}
+#configuration {
+  height:474px;
+}
+#setvhost_title {
+  margin:0px;
+  margin-left:4px;
+  padding:0px;
+}
+.vhost {
+  font-family:monospace;
+  font-size:12px;
 }
 
-ul#send_messages li {
+.command, .management {
   list-style:none;
   margin:10px;
-  border-bottom: 1px solid #e3e3e3;
+  margin-left:4px;
+  border-top: 1px solid #e3e3e3;
+  cursor:pointer;
+  font-family:monospace;
+  font-size:12px;
+}
+.open_close {
+  width:22px;
+  height:22px;
+  cursor:pointer;
+  display:block;
+  float:left;
+  background:url(/static/img/iconsprite.png) no-repeat scroll -30px -15px;
 }

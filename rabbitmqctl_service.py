@@ -67,7 +67,7 @@ class RabbitMQControlService(service.Service):
     def list_users(self):
         """list all users"""
         users = yield self.process.callRemote(self.nodename, self.module, "list_users")
-        users = [user.value for user in users]
+        users = sorted([user.value for user in users])
         response = {"command":"list_users", "count":len(users), "result":users}
         returnValue(response)
 
@@ -89,7 +89,7 @@ class RabbitMQControlService(service.Service):
     def list_vhosts(self):
         """list all vhosts"""
         vhosts = yield self.process.callRemote(self.nodename, self.module, "list_vhosts")
-        vhosts = [vhost.value for vhost in vhosts]
+        vhosts = sorted([vhost.value for vhost in vhosts])
         response = {"command":"list_vhosts", "count":len(vhosts), "result":vhosts}
         returnValue(response)
 
