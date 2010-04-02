@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+"""
+@file setup.py
+@author Paul Hubbard
+@date 8/24/09
+@brief setup file for attribute store
+@bug Depends on Redis, but no PyPi package for same exists.
+"""
+
+setupdict = {
+    'name' : 'attribute_store',
+    'version' : '0.2.1a',
+    'description' : 'OOI attribute store',
+    'url': 'http://www.oceanobservatories.org/spaces/display/CIDev/Attribute+Store+Design',
+    'download_url' : 'http://amoeba.ucsd.edu/packages/attribute_store/latest.tar.gz',
+    'license' : 'Apache 2.0',
+    'author' : 'Paul Hubbard',
+    'author_email' : 'hubbard@sdsc.edu',
+    'keywords': ['ooci'],
+    'classifiers' : [
+    'Development Status :: 3 - Alpha',
+    'Environment :: Console',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Topic :: Scientific/Engineering'],
+}
+
+try:
+    from setuptools import setup, find_packages
+    setupdict['packages'] = find_packages()
+    setupdict['test_suite'] = 'attribute_store.test'
+    setupdict['install_requires'] = ['Twisted', 'magnet', 'txredis']
+    setupdict['include_package_data'] = True
+    setup(**setupdict)
+
+except ImportError:
+    from distutils.core import setup
+    setupdict['packages'] = ['attribute_store']
+    setup(**setupdict)
