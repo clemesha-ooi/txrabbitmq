@@ -227,13 +227,22 @@ class RabbitMQControlService(service.Service):
         for v in result:
             address = ".".join([str(e) for e in v[1][1]])
             peer_address = ".".join([str(e) for e in v[3][1]])
+            #XXX are the below 'try/except' blocks needed? Put a timeout in these calls?
+            try:
+                host = socket.gethostbyaddr(address)[0]
+            except:
+                host = "<'host' could not be resolved for address='%s'>" % address
+            try:
+                peer_host = socket.gethostbyaddr(peer_address)[0]
+            except:
+                peer_host = "<'peer_host' could not be resolved for peer_address='%s'>" % peer_address
             info_all.append({
                 "pid":v[0][1].nodeName.text,
                 "address":address,
-                "host":socket.gethostbyaddr(address)[0],
+                "host":host,
                 "port":str(v[2][1]),
                 "peer_address":peer_address,
-                "peer_host":socket.gethostbyaddr(peer_address)[0],
+                "peer_host":peer_host,
                 "peer_port":str(v[4][1]),
                 "recv_oct":str(v[5][1]),
                 "recv_cnt":str(v[6][1]),
