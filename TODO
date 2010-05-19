@@ -1,0 +1,16 @@
+
+Tests
+-----
+- check for rabbitmq hostname in 'os.environ'.
+
+
+Web Interface
+-------------
+- separate api calls from web interface calls.
+- provide full-feature web-interface in 'examples' dir.
+
+Filter types:
+    - With connections, first filter by vhostname, then other.
+    - Filter by wildcard/regex
+    - Looking at Queues/Exchanges, now filter all Bindings that have corresponding Queues/Exchanges.
+    - Put in cookie to save Searches/Sorts?

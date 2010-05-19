@@ -1,5 +1,4 @@
 *.pyc
 twisted/plugins/dropin.cache
-TODO
 *.log
 *.pid
