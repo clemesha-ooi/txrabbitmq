@@ -5,7 +5,7 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 
 from twotp.node import Process, readCookie, buildNodeName
 
-from rabbitmqctl_service import RabbitMQControlService
+from txrabbitmq.service import RabbitMQControlService
 
 class TestRabbitMQControlService(unittest.TestCase):
     """Test the RabbitMQControlService.
