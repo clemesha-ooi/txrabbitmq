@@ -9,11 +9,7 @@ from irabbitmqctl import IRabbitMQControlService
 try:
     import json
 except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        print "FAILED: You must install simplejson or use python2.6"
-        sys.exit(1)
+    import simplejson as json
 
 
 class RabbitMQControlWebUI(resource.Resource):

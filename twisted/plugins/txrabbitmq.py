@@ -12,13 +12,12 @@ from zope.interface import implements
 from twisted.plugin import IPlugin
 from twisted.application.service import IServiceMaker
 from twisted.python.usage import Options
-from twisted.application import internet, service
+from twisted.application import internet
 from twisted.web import resource, server
 
 from twotp import Process, readCookie, buildNodeName
 
-from rabbitmqctl_service import RabbitMQControlService
-from webui.webui import RabbitMQControlWebUI
+from txrabbitmq.service import RabbitMQControlService
 
 class RESTRabbitmqctlOptions(Options):
     optParameters = [

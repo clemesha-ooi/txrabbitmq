@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 from stompservice import StompClientFactory
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
@@ -10,11 +9,7 @@ from twisted.internet import defer
 try:
     import json
 except ImportError:
-    try:
-        import simplejson as json
-    except ImportError:
-        print "FAILED: You must install simplejson or use python2.6"
-        sys.exit(1)
+    import simplejson as json
 
 CHANNEL_NAME = "/topic/rabbitmqctl"
 INTERVAL = 1.5 #seconds

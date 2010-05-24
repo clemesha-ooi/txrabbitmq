@@ -1,11 +1,11 @@
 import socket
 from twisted.application import service
 from twisted.internet.defer import inlineCallbacks, returnValue
-from zope.interface import Interface, implements
+from zope.interface import implements
 
 from twotp.term import Binary, Atom
 
-from irabbitmqctl import IRabbitMQControlService
+from txrabbitmq.irabbitmqctl import IRabbitMQControlService
 
 
 QUEUE_INFO_ITEMS = ["name", "durable", "auto_delete", "arguments", "pid", 
@@ -220,8 +220,8 @@ class RabbitMQControlService(service.Service):
     @inlineCallbacks
     def list_connections(self, connectioninfoitem=None):
         """list all connections"""
-        if connectioninfoitem is None:
-            infoitems = [Atom(item) for item in CONNECTION_INFO_ITEMS]
+        #if connectioninfoitem is None:
+        #    infoitems = [Atom(item) for item in CONNECTION_INFO_ITEMS]
         result = yield self.process.callRemote(self.nodename, "rabbit_networking", "connection_info_all")#, infoitems)
         info_all = []
         for v in result:
