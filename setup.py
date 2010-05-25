@@ -11,6 +11,6 @@ setup(
   download_url="http://github.com/clemesha-ooi/txrabbitmq/tarball/master",
   classifiers=[ ],
   packages=['txrabbitmq'],
-  data_files=[('twisted/plugins', ['twisted/plugins/txrabbitmq.py'])],
+  data_files=[('twisted/plugins', ['twisted/plugins/txrabbitmq_plugin.py'])],
   install_requires = ['twotp', 'twisted', 'simplejson'],
 )
