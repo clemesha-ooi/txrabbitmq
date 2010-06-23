@@ -1,0 +1,6 @@
+This directory contains the file:
+http://twistedmatrix.com/trac/browser/branches/websocket-4173-2/twisted/web/websocket.py
+because Twisted's WebSocket support is still in a branch.
+
+According to the Twisted development timeline, WebSockets will be merged
+into the trunk very soon, at which time this directory can be deleted. (06/22/2010).

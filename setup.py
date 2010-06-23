@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
   name = "txrabbitmq",
@@ -10,7 +10,7 @@ setup(
   url="http://github.com/clemesha-ooi/txrabbitmq",
   download_url="http://github.com/clemesha-ooi/txrabbitmq/tarball/master",
   classifiers=[ ],
-  packages=['txrabbitmq'],
+  packages=find_packages(),
   data_files=[('twisted/plugins', ['twisted/plugins/txrabbitmq_plugin.py'])],
   install_requires = ['twotp', 'twisted', 'simplejson'],
 )
