@@ -5,11 +5,11 @@ from txrabbitmq.service import RabbitMQControlService
 from twotp.node import Process, readCookie, buildNodeName
 
 
-def rabbitmqctl_client(erlang_cookie=None, nodename="txrabbitmq"):
-    cookie = readCookie() #TODO: allow passing 'erlang_cookie'
+def rabbitmqctl_client(nodename="rabbit@localhost"):
+    cookie = readCookie() #"~/.erlang.cookie" must exist
     nodeName = buildNodeName(nodename)
     process = Process(nodeName, cookie)
-    return RabbitMQControlService(process)
+    return RabbitMQControlService(process, nodeName)
 
 @inlineCallbacks
 def list_queues():

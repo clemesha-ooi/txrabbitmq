@@ -22,9 +22,10 @@ class TestRabbitMQControlService(unittest.TestCase):
 
     def setUp(self):
         cookie = readCookie()
-        nodeName = buildNodeName("test-txrabbitmq")
+        node = os.environ.get("TXRABBITMQ_NODENAME") or "rabbit@localhost"
+        nodeName = buildNodeName(node)
         self.process = Process(nodeName, cookie)
-        self.service = RabbitMQControlService(self.process)
+        self.service = RabbitMQControlService(self.process, nodeName)
 
     def tearDown(self):
         for epmd in self.process.oneShotEpmds.values():

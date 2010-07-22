@@ -36,7 +36,7 @@ From top-level package directory run::
 
 Get realtime data from RabbitMQ:
 
-From top-level package directory run::
+From the top-level package directory run::
 
     $ twistd -n txrabbitmq
 
@@ -46,6 +46,26 @@ Open 2nd shell, navigate to the directory `webui/push` and run::
     $ orbited --config=rabbitmq.cfg #second shell
 
 Open ports 8000 and 9000, to see commands data and push, respectively
+
+
+
+Testing
+-------
+
+From the top-level package directory run::
+
+    $ trial tests/test_service.py
+
+NOTES: 
+
+The RabbitMQ cookie must exist in ~/.erlang.cookie
+
+For testing with a remote RabbitMQ broker, before using trial run:: 
+
+      $ export TXRABBITMQ_NODENAME=my_node@my_remote_host
+
+Also, when testing with a remote RabbitMQ broker, make sure firewall
+rules allow communication of the Erlang Port Mapper Daemon (epmd).
 
 
 License
