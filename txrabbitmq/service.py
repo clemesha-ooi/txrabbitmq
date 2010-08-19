@@ -34,16 +34,16 @@ class RabbitMQControlService(service.Service):
 
     implements(IRabbitMQControlService)
 
-    def __init__(self, process, nodename="rabbit", module="rabbit_access_control"):
+    def __init__(self, process, remote_nodename, module="rabbit_access_control"):
         self.process = process
-        self.nodename = nodename
+        self.remote_nodename = remote_nodename
         self.module = module
 
     @inlineCallbacks
     def add_user(self, username, password):
         """add new user with given password"""
         username, password = Binary(username), Binary(password)
-        result = yield self.process.callRemote(self.nodename, self.module, "add_user", username, password)
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "add_user", username, password)
         response = {"command":"add_user", "username":username.value, "result":result.text}
         returnValue(response)
 
@@ -51,7 +51,7 @@ class RabbitMQControlService(service.Service):
     def delete_user(self, username):
         """delete user"""
         username = Binary(username)
-        result = yield self.process.callRemote(self.nodename, self.module, "delete_user", username)
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "delete_user", username)
         response = {"command":"delete_user", "username":username.value, "result":result.text}
         returnValue(response)
 
@@ -59,14 +59,14 @@ class RabbitMQControlService(service.Service):
     def change_password(self, username, password):
         """change user password"""
         username, password = Binary(username), Binary(password)
-        result = yield self.process.callRemote(self.nodename, self.module, "change_password", username, password)
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "change_password", username, password)
         response = {"command":"change_password", "username":username.value, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
     def list_users(self):
         """list all users"""
-        users = yield self.process.callRemote(self.nodename, self.module, "list_users")
+        users = yield self.process.callRemote(self.remote_nodename, self.module, "list_users")
         users = sorted([user.value for user in users])
         response = {"command":"list_users", "count":len(users), "result":users}
         returnValue(response)
@@ -74,21 +74,21 @@ class RabbitMQControlService(service.Service):
     @inlineCallbacks
     def add_vhost(self, vhostpath):
         """add new vhost"""
-        result = yield self.process.callRemote(self.nodename, self.module, "add_vhost", Binary(vhostpath))
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "add_vhost", Binary(vhostpath))
         response = {"command":"add_vhost", "vhostpath":vhostpath, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
     def delete_vhost(self, vhostpath):
         """delete vhost"""
-        result = yield self.process.callRemote(self.nodename, self.module, "delete_vhost", Binary(vhostpath))
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "delete_vhost", Binary(vhostpath))
         response = {"command":"delete_vhost", "vhostpath":vhostpath, "result":result.text}
         returnValue(response)
 
     @inlineCallbacks
     def list_vhosts(self):
         """list all vhosts"""
-        vhosts = yield self.process.callRemote(self.nodename, self.module, "list_vhosts")
+        vhosts = yield self.process.callRemote(self.remote_nodename, self.module, "list_vhosts")
         vhosts = sorted([vhost.value for vhost in vhosts])
         response = {"command":"list_vhosts", "count":len(vhosts), "result":vhosts}
         returnValue(response)
@@ -100,7 +100,7 @@ class RabbitMQControlService(service.Service):
             vhostpath = "/"
         username, vhostpath, config_regex, write_regex, read_regex = Binary(username), Binary(vhostpath), \
                  Binary(config_regex), Binary(write_regex), Binary(read_regex)
-        result = yield self.process.callRemote(self.nodename, self.module, "set_permissions", username, \
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "set_permissions", username, \
                  vhostpath, config_regex, write_regex, read_regex)
         response = {"command":"set_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result}
         returnValue(response)
@@ -111,7 +111,7 @@ class RabbitMQControlService(service.Service):
         if vhostpath is None:
             vhostpath = "/"
         username, vhostpath = Binary(username), Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, self.module, "clear_permissions", username, vhostpath)
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "clear_permissions", username, vhostpath)
         response = {"command":"clear_permissions", "username":username.value, "vhostpath":vhostpath.value, "result":result}
         returnValue(response)
 
@@ -121,7 +121,7 @@ class RabbitMQControlService(service.Service):
         if vhostpath is None:
             vhostpath = "/"
         vhostpath = Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, self.module, "list_vhost_permissions", vhostpath)
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "list_vhost_permissions", vhostpath)
         result_all = {}
         for v in result:
             username = v[0].value
@@ -138,7 +138,7 @@ class RabbitMQControlService(service.Service):
         if username is None:
             username = "guest"
         username = Binary(username)
-        result = yield self.process.callRemote(self.nodename, self.module, "list_user_permissions", username)
+        result = yield self.process.callRemote(self.remote_nodename, self.module, "list_user_permissions", username)
         result_all = {}
         for v in result:
             vhostpath = v[0].value
@@ -157,7 +157,7 @@ class RabbitMQControlService(service.Service):
         vhostpath = Binary(vhostpath)
         if queueinfoitem is None:
             infoitems = [Atom(item) for item in QUEUE_INFO_ITEMS]
-        result = yield self.process.callRemote(self.nodename, "rabbit_amqqueue", "info_all", vhostpath, infoitems)
+        result = yield self.process.callRemote(self.remote_nodename, "rabbit_amqqueue", "info_all", vhostpath, infoitems)
         info_all = []
         for v in result:
             info_all.append((v[0][1][3].value, 
@@ -185,7 +185,7 @@ class RabbitMQControlService(service.Service):
         vhostpath = Binary(vhostpath)
         if exchangeinfoitem is None:
             infoitems = [Atom(item) for item in EXCHANGE_INFO_ITEMS]
-        result = yield self.process.callRemote(self.nodename, "rabbit_exchange", "info_all", vhostpath, infoitems)
+        result = yield self.process.callRemote(self.remote_nodename, "rabbit_exchange", "info_all", vhostpath, infoitems)
         info_all = []
         for v in result:
             # [(exch1, infodict1), (exch2, infodict2), ...]
@@ -204,7 +204,7 @@ class RabbitMQControlService(service.Service):
         if vhostpath is None:
             vhostpath = "/"
         vhostpath = Binary(vhostpath)
-        result = yield self.process.callRemote(self.nodename, "rabbit_exchange", "list_bindings", vhostpath)
+        result = yield self.process.callRemote(self.remote_nodename, "rabbit_exchange", "list_bindings", vhostpath)
         info_all = []
         for v in result:
             exchange = v[0][3].value
@@ -222,7 +222,7 @@ class RabbitMQControlService(service.Service):
         """list all connections"""
         #if connectioninfoitem is None:
         #    infoitems = [Atom(item) for item in CONNECTION_INFO_ITEMS]
-        result = yield self.process.callRemote(self.nodename, "rabbit_networking", "connection_info_all")#, infoitems)
+        result = yield self.process.callRemote(self.remote_nodename, "rabbit_networking", "connection_info_all")#, infoitems)
         info_all = []
         for v in result:
             address = ".".join([str(e) for e in v[1][1]])
